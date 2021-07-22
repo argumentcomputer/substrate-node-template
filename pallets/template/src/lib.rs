@@ -36,10 +36,10 @@ pub mod pallet {
 	// The pallet's runtime storage items.
 	// https://substrate.dev/docs/en/knowledgebase/runtime/storage
 	#[pallet::storage]
-	#[pallet::getter(fn something)]
+	#[pallet::getter(fn cid)]
 	// Learn more about declaring storage items:
 	// https://substrate.dev/docs/en/knowledgebase/runtime/storage#declaring-storage-items
-	pub(super) type Cid<T> = StorageValue<_, Vec<u8>>;
+	pub(super) type Cid<T> = StorageValue<_, (Vec<u8>, u32)>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://substrate.dev/docs/en/knowledgebase/runtime/events
@@ -47,10 +47,8 @@ pub mod pallet {
 	#[pallet::metadata(T::AccountId = "AccountId")]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		/// Event documentation should end with an array that provides descriptive names for event
-		/// parameters. [something, who]
-		CidStored(T::AccountId, Vec<u8>),
-    CidRetrieved(T::AccountId, Vec<u8>),
+		CidStored(T::AccountId, (Vec<u8>, u32)),
+    CidRetrieved(T::AccountId, (Vec<u8>, u32)),
 	}
 
 	// Errors inform users that something went wrong.
@@ -83,10 +81,10 @@ pub mod pallet {
       runtime_print!("Request sent by: {:?}", who);
 
 			// Insert into storage.
-			<Cid<T>>::put(cid.clone());
+			<Cid<T>>::put((cid.clone(), input));
 
 			// Emit an event.
-			Self::deposit_event(Event::CidStored(who, cid));
+			Self::deposit_event(Event::CidStored(who, (cid, input)));
 
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
@@ -99,20 +97,14 @@ pub mod pallet {
 			// https://substrate.dev/docs/en/knowledgebase/runtime/origin
 			let who = ensure_signed(origin)?;
 
-        // Retrieve from storage
-        //let data = <Cid<T>>::get(cid);
-      //Retrieve data from CID
-        //let data: u32 = match DagCborCodec.decode(ByteCursor::new(cid.clone())).expect("invalid ipld cbor.") {
-        //    Ipld::Integer(uint) => uint as u32,
-        //    _ => 0 as u32,
-        //};
-      let data = 5;
+      // Retrieve from storage
+      let data = <Cid<T>>::get().unwrap().1;
 
       runtime_print!("Decoded data: {} from dag-cbor CID: {:?}", data, cid);
       runtime_print!("Request sent by: {:?}", who);
 
 			// Emit an event.
-			Self::deposit_event(Event::CidRetrieved(who, cid));
+			Self::deposit_event(Event::CidRetrieved(who, (cid, data)));
 
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
