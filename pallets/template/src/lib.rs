@@ -42,7 +42,7 @@ pub mod pallet {
   // The pallet's runtime storage items.
   // https://substrate.dev/docs/en/knowledgebase/runtime/storage
   #[pallet::storage]
-  #[pallet::getter(fn cid)]
+  #[pallet::getter(fn vec)]
   // Learn more about declaring storage items:
   // https://substrate.dev/docs/en/knowledgebase/runtime/storage#declaring-storage-items
   pub(super) type StorageVector<T> = StorageValue<_, Vec<u8>>;
@@ -51,8 +51,6 @@ pub mod pallet {
   // https://substrate.dev/docs/en/knowledgebase/runtime/events
   #[pallet::event]
   #[pallet::metadata(T::AccountId = "AccountId")]
-  #[pallet::generate_deposit(pub(super) fn deposit_event)]
-  // TODO: Make Vector generic by restricting T to sp_std::fmt::Debug
   pub enum Event<T: Config> {
     VectorStored(T::AccountId, Vec<u8>),
     VectorRetrieved(T::AccountId, Vec<u8>),
@@ -77,55 +75,16 @@ pub mod pallet {
     /// writes the value to storage and emits an event. This function must
     /// be dispatched by a signed extrinsic.
     #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-    pub fn store_vector(
-      origin: OriginFor<T>,
-      input: Vec<u8>,
-    ) -> DispatchResult {
-      // Check that the extrinsic was signed and get the signer.
-      // This function will return an error if the extrinsic is not signed.
-      // https://substrate.dev/docs/en/knowledgebase/runtime/origin
-      let who = ensure_signed(origin)?;
-
-      runtime_print!("Entered vector: {:?}", input);
-      runtime_print!("Request sent by: {:?}", who);
-
-      // Insert into storage.
-      <StorageVector<T>>::put(input.clone());
-
-      // Emit an event.
-      Self::deposit_event(Event::VectorStored(who, input));
-
-      runtime_print!("Vector stored successfully");
-
-      // Return a successful DispatchResultWithPostInfo
-      Ok(())
-    }
-
-    #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-    pub fn retrieve_vector(origin: OriginFor<T>) -> DispatchResult {
-      let who = ensure_signed(origin)?;
-
-      // Retrieve from storage
-      let stored_vec = <StorageVector<T>>::get().unwrap();
-
-      runtime_print!("Vector retrieved: {:?}", stored_vec);
-      runtime_print!("Request sent by: {:?}", who);
-
-      // Emit an event.
-      Self::deposit_event(Event::VectorRetrieved(who, stored_vec));
-
-      // Return a successful DispatchResultWithPostInfo
-      Ok(())
-    }
-
-    #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
     pub fn push_front_vector(
       origin: OriginFor<T>,
       input: u8,
     ) -> DispatchResult {
       let who = ensure_signed(origin)?;
 
-      let stored_vec = <StorageVector<T>>::get().unwrap();
+      let stored_vec: Vec<u8> = match <StorageVector<T>>::get() {
+        Some(vec) => vec,
+        None => Vec::new(),
+      };
 
       // Convert Vec into Vector for push_front
       let mut im_vec = Vector::from(stored_vec);
