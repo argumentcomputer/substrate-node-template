@@ -22,10 +22,7 @@ pub mod pallet {
     runtime_print,
   };
   use frame_system::pallet_prelude::*;
-  use sp_ipld::{
-    dag_cbor,
-    Ipld,
-  };
+  use sp_im::Vector;
   use sp_std::vec::Vec;
 
   /// Configure the pallet by specifying the parameters and types on which it
@@ -48,16 +45,17 @@ pub mod pallet {
   #[pallet::getter(fn cid)]
   // Learn more about declaring storage items:
   // https://substrate.dev/docs/en/knowledgebase/runtime/storage#declaring-storage-items
-  pub(super) type Cid<T> = StorageValue<_, (Vec<u8>, u32)>;
+  pub(super) type StorageVector<T> = StorageValue<_, Vec<u8>>;
 
   // Pallets use events to inform users when important changes are made.
   // https://substrate.dev/docs/en/knowledgebase/runtime/events
   #[pallet::event]
   #[pallet::metadata(T::AccountId = "AccountId")]
   #[pallet::generate_deposit(pub(super) fn deposit_event)]
+  // TODO: Make Vector generic by restricting T to sp_std::fmt::Debug
   pub enum Event<T: Config> {
-    CidStored(T::AccountId, (Vec<u8>, u32)),
-    CidRetrieved(T::AccountId, (Vec<u8>, u32)),
+    VectorStored(T::AccountId, Vec<u8>),
+    VectorRetrieved(T::AccountId, Vec<u8>),
   }
 
   // Errors inform users that something went wrong.
@@ -79,46 +77,69 @@ pub mod pallet {
     /// writes the value to storage and emits an event. This function must
     /// be dispatched by a signed extrinsic.
     #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-    pub fn store_ipld(origin: OriginFor<T>, input: u32) -> DispatchResult {
+    pub fn store_vector(
+      origin: OriginFor<T>,
+      input: Vec<u8>,
+    ) -> DispatchResult {
       // Check that the extrinsic was signed and get the signer.
       // This function will return an error if the extrinsic is not signed.
       // https://substrate.dev/docs/en/knowledgebase/runtime/origin
       let who = ensure_signed(origin)?;
 
-      // Construct CID from input
-      let cid: Vec<u8> =
-        dag_cbor::cid(&Ipld::Integer(input as i128)).to_bytes();
-
-      runtime_print!("Encoded input: {} into dag-cbor CID: {:?}", input, cid);
+      runtime_print!("Entered vector: {:?}", input);
       runtime_print!("Request sent by: {:?}", who);
 
       // Insert into storage.
-      <Cid<T>>::put((cid.clone(), input));
+      <StorageVector<T>>::put(input.clone());
 
       // Emit an event.
-      Self::deposit_event(Event::CidStored(who, (cid, input)));
+      Self::deposit_event(Event::VectorStored(who, input));
+
+      runtime_print!("Vector stored successfully");
 
       // Return a successful DispatchResultWithPostInfo
       Ok(())
     }
 
     #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-    pub fn retrieve_ipld(origin: OriginFor<T>, cid: Vec<u8>) -> DispatchResult {
-      // Check that the extrinsic was signed and get the signer.
-      // This function will return an error if the extrinsic is not signed.
-      // https://substrate.dev/docs/en/knowledgebase/runtime/origin
+    pub fn retrieve_vector(origin: OriginFor<T>) -> DispatchResult {
       let who = ensure_signed(origin)?;
 
       // Retrieve from storage
-      let data = <Cid<T>>::get().unwrap().1;
+      let stored_vec = <StorageVector<T>>::get().unwrap();
 
-      runtime_print!("Decoded data: {} from dag-cbor CID: {:?}", data, cid);
+      runtime_print!("Vector retrieved: {:?}", stored_vec);
       runtime_print!("Request sent by: {:?}", who);
 
       // Emit an event.
-      Self::deposit_event(Event::CidRetrieved(who, (cid, data)));
+      Self::deposit_event(Event::VectorRetrieved(who, stored_vec));
 
       // Return a successful DispatchResultWithPostInfo
+      Ok(())
+    }
+
+    #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+    pub fn push_front_vector(
+      origin: OriginFor<T>,
+      input: u8,
+    ) -> DispatchResult {
+      let who = ensure_signed(origin)?;
+
+      let stored_vec = <StorageVector<T>>::get().unwrap();
+
+      // Convert Vec into Vector for push_front
+      let mut im_vec = Vector::from(stored_vec);
+      im_vec.push_front(input);
+
+      // Convert back to Vec for serialization
+      let stored_vec: Vec<u8> = im_vec.into_iter().collect::<Vec<_>>();
+
+      runtime_print!("Pushed the value {} onto vector {:?}", input, stored_vec);
+
+      <StorageVector<T>>::put(stored_vec);
+
+      runtime_print!("Request sent by: {:?}", who);
+
       Ok(())
     }
 
@@ -128,7 +149,7 @@ pub mod pallet {
       let _who = ensure_signed(origin)?;
 
       // Read a value from storage.
-      match <Cid<T>>::get() {
+      match <StorageVector<T>>::get() {
         // Return an error if the value has not been set.
         None => Err(Error::<T>::NoneValue)?,
         Some(_) => Ok(()),

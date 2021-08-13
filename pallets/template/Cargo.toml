@@ -40,7 +40,7 @@ std = [
     'frame-support/std',
     'frame-system/std',
     'frame-benchmarking/std',
-    'sp-ipld/std',
+    'sp-im/std',
 ]
 try-runtime = ['frame-support/try-runtime']
 [dependencies.codec]
@@ -72,8 +72,7 @@ version = '3.0.0'
 default-features = false
 version = '3.0.0'
 
-[dependencies.sp-ipld]
+[dependencies.sp-im]
 default-features = false
-features = ["dag-cbor"]
-git = 'https://github.com/yatima-inc/sp-ipld'
-version = '0.1'
+git = 'https://github.com/yatima-inc/sp-im'
+version = '0.0.1'
