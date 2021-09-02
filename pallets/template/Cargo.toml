@@ -39,6 +39,7 @@ std = [
     'frame-support/std',
     'frame-system/std',
     'frame-benchmarking/std',
+    'yatima-core/std',
 ]
 try-runtime = ['frame-support/try-runtime']
 [dependencies.codec]
@@ -65,3 +66,12 @@ default-features = false
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-07'
 version = '3.0.0'
+
+[dependencies.sp-std]
+default-features = false
+version = '3.0.0'
+
+[dependencies.yatima-core]
+default-features = false
+git = 'https://github.com/yatima-inc/yatima'
+branch = "sb/no-std" 
