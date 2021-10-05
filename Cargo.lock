@@ -449,6 +449,15 @@ checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
 name = "bitmaps"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "031043d04099746d8db04daf1fa424b2bc8bd69d92b25962dcde24da39ab64a2"
+dependencies = [
+ "typenum",
+]
+
+[[package]]
+name = "bitmaps"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "303cec55cd9c5fde944b061b902f142b52a8bb5438cc822481ea1e3ebc96bbcb"
@@ -5097,15 +5106,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ropey"
-version = "1.2.0"
-source = "git+https://github.com/yatima-inc/ropey?branch=main#a963a69cd748846ad5810413817178ce28501acd"
-dependencies = [
- "smallvec 1.6.1",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "rpassword"
 version = "5.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6425,9 +6425,11 @@ dependencies = [
 [[package]]
 name = "sized-chunks"
 version = "0.6.5"
-source = "git+https://github.com/yatima-inc/sized-chunks?branch=master#ba09facdef63f6150499e7fc7d6a49fba6da3dd5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16d69225bde7a69b235da73377861095455d298f2b970996eec25ddbb42b3d1e"
 dependencies = [
- "bitmaps",
+ "bitmaps 2.1.0",
+ "typenum",
 ]
 
 [[package]]
@@ -6615,9 +6617,9 @@ dependencies = [
 
 [[package]]
 name = "sp-cid"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da843dbbf2ad94e34a4391b03123399dcd6a5339aa1884d5d81972d2ece64d41"
+checksum = "1f6679868c6e03b718cf153c5b63cf2003caea52e2883d827e257ff1d87a2518"
 dependencies = [
  "bytecursor",
  "multibase 0.9.1",
@@ -6809,9 +6811,10 @@ dependencies = [
 [[package]]
 name = "sp-im"
 version = "0.1.0"
-source = "git+https://github.com/yatima-inc/sp-im?branch=sb/no-std#eeec9dee9620076b0b5eb1ee61dfb30940df9bac"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "30c3320ed23a386f80c2286b2de6837c9628750fa774213ceafa0f5927d37f23"
 dependencies = [
- "bitmaps",
+ "bitmaps 3.1.0",
  "rand_core 0.5.1",
  "rand_xoshiro",
  "sized-chunks",
@@ -6862,9 +6865,9 @@ dependencies = [
 
 [[package]]
 name = "sp-ipld"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "989cc43356e8d4eeb42e5bc8b1a363e98c45cc8f026ea81d96790a2fc955b3a6"
+checksum = "011fe60ba0749463d2ceb2b48d312cb1eadc2f0d4113283434c1e3591afa4a81"
 dependencies = [
  "bytecursor",
  "byteorder",
@@ -6915,16 +6918,15 @@ dependencies = [
 
 [[package]]
 name = "sp-multihash"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c74624433a8926e495041e78f8414771067895e0e2608c22b1771792714001ee"
+checksum = "467bd5355a48613e79954f91521f9a19313fc0c52d1ff8b9291aee1ae43a2909"
 dependencies = [
  "blake2b_simd",
  "blake2s_simd",
  "blake3",
  "bytecursor",
  "digest 0.9.0",
- "generic-array 0.14.4",
  "sha2 0.9.5",
  "sha3",
  "sp-multihash-derive",
@@ -6934,9 +6936,9 @@ dependencies = [
 
 [[package]]
 name = "sp-multihash-derive"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50f2fec51df320e33df53351cb5a11ca60257b4915f6a76efb667f2ea0662fc2"
+checksum = "854e6e8b041cde8578bb5efd6eacdd70f86aef22393e5a0f386991dc8fca45de"
 dependencies = [
  "proc-macro-crate 1.0.0",
  "proc-macro-error",
@@ -6962,6 +6964,16 @@ version = "3.0.0"
 source = "git+https://github.com/paritytech/substrate.git?tag=monthly-2021-07#83808aa815a9fbc528b76cd25ae1dec57e269771"
 dependencies = [
  "backtrace",
+]
+
+[[package]]
+name = "sp-ropey"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13174a29799d2ad1635e5f7dfda43f76d0fa5fcce14fd9b231eaae8e4214986c"
+dependencies = [
+ "smallvec 1.6.1",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -7046,6 +7058,15 @@ dependencies = [
  "sp-runtime",
  "sp-staking",
  "sp-std 3.0.0 (git+https://github.com/paritytech/substrate.git?tag=monthly-2021-07)",
+]
+
+[[package]]
+name = "sp-sized-chunks"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "48b91f9c361e49548aae5e54de185b17f09485803cd09bd61f25a168a4ff0e93"
+dependencies = [
+ "bitmaps 3.1.0",
 ]
 
 [[package]]
@@ -8770,19 +8791,20 @@ dependencies = [
 [[package]]
 name = "yatima-core"
 version = "0.1.0"
-source = "git+https://github.com/yatima-inc/yatima?branch=sb/no-std#b3bfc8b8b572ceaba0937e12a3b1bc1042f7724b"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3f0bc7762bf6f095a932de9c615579e6e7034477e586b84548e69a9c1b0892e"
 dependencies = [
  "base-x",
  "multibase 0.9.1",
  "nom 6.1.2",
  "nom_locate",
  "num-bigint 0.3.2",
- "ropey",
- "sized-chunks",
  "sp-cid",
  "sp-im",
  "sp-ipld",
  "sp-multihash",
+ "sp-ropey",
+ "sp-sized-chunks",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

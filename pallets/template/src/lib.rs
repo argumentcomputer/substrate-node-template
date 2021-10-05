@@ -63,8 +63,8 @@ pub mod pallet {
   // Dispatchable functions must be annotated with a weight and must return a DispatchResult.
   #[pallet::call]
   impl<T: Config> Pallet<T> {
-    /// An example dispatchable that takes a singles value as a parameter, writes the value to
-    /// storage and emits an event. This function must be dispatched by a signed extrinsic.
+    /// A dispatchable that takes a serialized Yatima program as a vector of bytes,
+	/// then parses and typechecks the theorem to prove its validity
     #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
     pub fn theorem_prover(origin: OriginFor<T>, input: Vec<u8>) -> DispatchResult {
       // Check that the extrinsic was signed and get the signer.
