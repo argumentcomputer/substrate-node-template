@@ -51,10 +51,8 @@ pub mod pallet {
   // Errors inform users that something went wrong.
   #[pallet::error]
   pub enum Error<T> {
-    /// Error names should be descriptive.
-    NoneValue,
-    /// Errors should have helpful documentation associated with them.
-    StorageOverflow,
+    ParseError,
+    TypeError 
   }
 
   // Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -63,7 +61,7 @@ pub mod pallet {
   #[pallet::call]
   impl<T: Config> Pallet<T> {
     /// A dispatchable that takes a serialized Yatima program as a vector of bytes,
-	/// then parses and typechecks the theorem to prove its validity
+    /// then parses and typechecks the theorem to prove its validity
     #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
     pub fn theorem_prover(origin: OriginFor<T>, input: Vec<u8>) -> DispatchResult {
       // Check that the extrinsic was signed and get the signer.
@@ -75,13 +73,15 @@ pub mod pallet {
         Err(_) => String::from("Error: Decode failed"),
       };
 
-      // Parse and typecheck Yatima code
-      let defs = Rc::new(
-        parse_defs(input_cid(&contents), Defs::new())(Span::new(&contents))
-          .unwrap()
-          .1
-           .0,
-      );
+      // Parse Yatima code into definitions
+      let defs = match parse_defs(input_cid(&contents), Defs::new())(Span::new(&contents)) {
+	  Ok(d) => Rc::new(d.1.0),
+	  Err(e) => {
+	    runtime_print!("\n\n{}\n", e);
+	    return Err(Error::<T>::ParseError)?
+	  }
+	};
+
       // Iterate over Defs and typecheck each
       for (name, _) in defs.names.iter() {
         match check_def(defs.clone(), name, false) {
@@ -94,6 +94,7 @@ pub mod pallet {
           }
           Err(err) => {
             runtime_print!("✕ {}: {}", name.to_string(), err);
+	    return Err(Error::<T>::TypeError)?
           }
         }
       }
